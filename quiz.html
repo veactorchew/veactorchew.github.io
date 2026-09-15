@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Meet Mello – RISE Personality Test</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f7f8fc; color: #2d2d4e; min-height: 100vh; }
+
+  nav { background: #1a1a3e; padding: 18px 48px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { font-size: 1.4rem; font-weight: 800; color: #fff; }
+  .nav-logo span { color: #f9c74f; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; }
+  .nav-links a:hover { color: #fff; }
+  .nav-user { color: rgba(255,255,255,0.85); font-size: 0.9rem; font-weight: 500; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  #welcome-screen { min-height: calc(100vh - 62px); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; background: linear-gradient(135deg, #f0fafa 0%, #f5f0ff 50%, #fff5f8 100%); }
+  #welcome-screen.active { display: flex; }
+  .welcome-badge { background: #e8f8f5; color: #00897b; font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 24px; display: inline-block; }
+  .welcome-title { font-size: 3rem; font-weight: 800; color: #1a1a3e; line-height: 1.15; margin-bottom: 16px; }
+  .welcome-title span { color: #00b4a0; }
+  .welcome-subtitle { font-size: 1.05rem; color: #666; max-width: 620px; line-height: 1.7; margin-bottom: 24px; }
+  .instruction-box { background: rgba(255,255,255,0.8); border: 1px solid #e8e8f0; border-radius: 16px; padding: 18px 22px; max-width: 620px; margin-bottom: 30px; text-align: left; }
+  .instruction-box strong { color: #1a1a3e; }
+  .rank-legend { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+  .rank-chip { background: #fff; border: 1px solid #e2e2ec; border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; color: #555; }
+  .rise-pills { display: flex; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; justify-content: center; }
+  .rise-pill { padding: 8px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+  .pill-r { background: #e0f7f5; color: #00897b; }
+  .pill-i { background: #ede7f6; color: #6a1b9a; }
+  .pill-s { background: #fce4ec; color: #c2185b; }
+  .pill-e { background: #fff8e1; color: #f57f17; }
+  .welcome-form { background: #fff; border-radius: 20px; padding: 40px 48px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); max-width: 460px; width: 100%; }
+  .welcome-form h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: #1a1a3e; }
+  .welcome-form p { font-size: 0.88rem; color: #888; margin-bottom: 24px; }
+  .welcome-form input { width: 100%; padding: 14px 18px; border: 2px solid #e8e8f0; border-radius: 12px; font-size: 1rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; margin-bottom: 16px; }
+  .welcome-form input:focus { border-color: #00b4a0; }
+  .btn-start { width: 100%; padding: 15px; background: #1a1a3e; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .btn-start:hover { background: #2d2d6e; }
+
+  #quiz-screen { min-height: calc(100vh - 62px); padding: 48px 24px 80px; max-width: 900px; margin: 0 auto; }
+  .quiz-top { margin-bottom: 28px; position: sticky; top: 74px; z-index: 20; background: rgba(247,248,252,0.96); padding-bottom: 12px; }
+  .quiz-progress-label { font-size: 0.82rem; color: #999; margin-bottom: 8px; }
+  .quiz-progress-bar-wrap { background: #e8e8f0; border-radius: 8px; height: 6px; }
+  .quiz-progress-bar { height: 6px; border-radius: 8px; background: linear-gradient(90deg, #00b4a0, #7c3aed); transition: width 0.4s ease; width: 0%; }
+
+  .question-block { padding: 30px 0 34px; border-bottom: 1px solid #ececf4; }
+  .question-block:last-of-type { border-bottom: none; }
+  .question-scenario { font-size: 0.75rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #aaa; margin-bottom: 8px; }
+  .question-text { font-size: 1.08rem; font-weight: 700; color: #1a1a3e; margin-bottom: 8px; line-height: 1.55; }
+  .question-help { font-size: 0.82rem; color: #8b8b99; margin-bottom: 18px; }
+  .ranked-list { display: flex; flex-direction: column; gap: 10px; min-height: 120px; }
+
+  .option-card { display: flex; align-items: stretch; gap: 12px; user-select: none; }
+  .drag-handle { width: 42px; border-radius: 12px; background: #ececf5; color: #888; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: grab; flex: 0 0 auto; }
+  .drag-handle:active { cursor: grabbing; }
+  .option-label { flex: 1; display: flex; align-items: center; min-height: 70px; padding: 14px 16px; border: 2px solid #e8e8f0; border-radius: 14px; background: #fff; font-size: 0.9rem; color: #444; line-height: 1.5; cursor: grab; transition: all 0.15s; }
+  .option-label:hover { border-color: #c9c9dc; background: #fafaff; }
+  .option-card.dragging { opacity: 0.45; }
+  .option-card.drag-over .option-label { border-color: #00b4a0; background: #f0fffc; }
+  .rank-badge { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; align-items: center; justify-content: center; background: #1a1a3e; color: #fff; font-weight: 800; font-size: 0.8rem; margin-right: 10px; flex: 0 0 auto; }
+  .option-letter { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; margin-right: 10px; background: #f0f0f8; color: #888; flex: 0 0 auto; }
+
+  .unanswered .question-text { color: #c0392b; }
+  .unanswered { background: #fff5f5; border-radius: 16px; padding: 16px; margin: -8px; }
+  .btn-submit-wrap { text-align: center; margin-top: 48px; }
+  .btn-submit { padding: 16px 56px; background: #1a1a3e; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .btn-submit:hover { background: #2d2d6e; }
+  .error-msg { color: #c0392b; font-size: 0.88rem; margin-top: 12px; display: none; }
+
+  /* RESULTS */
+  #results-screen { min-height: calc(100vh - 62px); padding: 48px 24px 80px; max-width: 960px; margin: 0 auto; display: none; }
+  #results-screen.active { display: block; }
+  .results-hero { text-align: center; margin-bottom: 40px; }
+  .results-badge { display: inline-block; background: #e8f8f5; color: #00897b; font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; }
+  .results-title { font-size: 2.2rem; font-weight: 800; color: #1a1a3e; margin-bottom: 8px; }
+  .results-subtitle { font-size: 1rem; color: #888; }
+
+  .mello-intro-card { border-radius: 28px; padding: 40px 32px 36px; margin-bottom: 32px; text-align: center; position: relative; overflow: visible; }
+  .mello-card-r { background: linear-gradient(160deg, #e0f7f5 0%, #b2dfdb 100%); }
+  .mello-card-i { background: linear-gradient(160deg, #ede7f6 0%, #ce93d8 100%); }
+  .mello-card-s { background: linear-gradient(160deg, #fce4ec 0%, #f48fb1 100%); }
+  .mello-card-e { background: linear-gradient(160deg, #fff8e1 0%, #ffe082 100%); }
+  .mello-you-are { font-size: 0.85rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; opacity: 0.7; }
+  .mello-big-name { font-size: 2.4rem; font-weight: 900; margin-bottom: 6px; color: #1a1a3e; letter-spacing: -0.5px; }
+  .mello-tagline { font-size: 1rem; font-weight: 500; margin-bottom: 28px; opacity: 0.75; color: #1a1a3e; }
+  .mello-svg-wrap { display: inline-block; animation: melloFloat 3s ease-in-out infinite; filter: drop-shadow(0 14px 28px rgba(0,0,0,0.18)); margin-bottom: 20px; }
+  @keyframes melloFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  @keyframes melloDrop { from { opacity:0; transform: translateY(-30px) scale(0.75); } to { opacity:1; transform: translateY(0) scale(1); } }
+  .mello-enter { animation: melloDrop 0.9s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .mello-traits { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .mello-trait-pill { padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background: rgba(255,255,255,0.6); color: #1a1a3e; }
+
+  .primary-card { border-radius: 24px; padding: 40px; margin-bottom: 32px; color: #fff; display: flex; align-items: center; gap: 32px; flex-wrap: wrap; animation: fadeUp 0.6s ease both; animation-delay: 0.2s; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  .primary-card-text { flex: 1; min-width: 200px; }
+  .primary-card-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.85; margin-bottom: 8px; }
+  .primary-card-name { font-size: 2rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
+  .primary-card-desc { font-size: 0.98rem; opacity: 0.92; line-height: 1.7; margin-bottom: 14px; }
+  .primary-card-tagline { font-size: 0.88rem; font-weight: 600; opacity: 0.8; font-style: italic; }
+  .primary-card-score-box { text-align: center; min-width: 145px; }
+  .primary-card-pct { font-size: 3.5rem; font-weight: 800; line-height: 1; }
+  .primary-card-pct-label { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }
+
+  .score-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
+  .score-card { background: #fff; border-radius: 20px; padding: 28px 22px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border-top: 4px solid; animation: fadeUp 0.5s ease both; }
+  .score-card-theme { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px; }
+  .score-card-name { font-size: 0.98rem; font-weight: 700; color: #1a1a3e; margin-bottom: 14px; }
+  .score-card-pct { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+  .score-bar-bg { background: #f0f0f8; border-radius: 8px; height: 8px; margin-bottom: 12px; }
+  .score-bar-fill { height: 8px; border-radius: 8px; width: 0%; transition: width 1.2s ease; }
+  .score-card-desc { font-size: 0.82rem; color: #666; line-height: 1.6; }
+
+  .radar-section { background: #fff; border-radius: 20px; padding: 32px 32px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 32px; text-align: center; }
+  .radar-section h3 { font-size: 0.85rem; font-weight: 700; color: #1a1a3e; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; }
+  .scoring-note { margin-top: 18px; color: #888; font-size: 0.8rem; line-height: 1.6; }
+  .whats-next { background: #1a1a3e; border-radius: 20px; padding: 40px; color: #fff; text-align: center; }
+  .whats-next h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; }
+  .whats-next p { font-size: 0.95rem; opacity: 0.8; line-height: 1.7; max-width: 480px; margin: 0 auto 24px; }
+  .btn-retake { padding: 14px 40px; background: #f9c74f; color: #1a1a3e; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+  .btn-retake:hover { background: #f3b700; }
+
+  @media (max-width: 600px) {
+    nav { padding: 16px 20px; }
+    .nav-links { gap: 14px; }
+    .welcome-title { font-size: 2rem; }
+    .welcome-form { padding: 28px 20px; }
+    .primary-card { flex-direction: column; text-align: center; }
+    .option-label { font-size: 0.86rem; }
+    .drag-handle { width: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">meet <span>mello</span> ✦</div>
+  <div class="nav-links">
+    <a onclick="goHome()">Home</a>
+    <a onclick="goResults()">Your Results</a>
+  </div>
+  <div class="nav-user" id="nav-user"></div>
+</nav>
+
+<div id="welcome-screen" class="screen active">
+  <div class="welcome-badge">✦ RISE Personality Assessment</div>
+  <h1 class="welcome-title">Discover Your<br/><span>RISE Profile</span></h1>
+  <p class="welcome-subtitle">Rank your responses across 15 real-life scenarios and discover which RISE characteristic is your strongest preference. ~5 minutes</p>
+
+  <div class="instruction-box">
+    <strong>How it works</strong>
+    <p style="margin-top:8px;color:#666;line-height:1.6;font-size:.9rem;">
+      For each scenario, rank all four responses based on what you would <em>actually</em> be most likely to do.
+      There are no right or wrong answers.
+    </p>
+    <div class="rank-legend">
+      <span class="rank-chip"><strong>1</strong> = Most likely</span>
+      <span class="rank-chip"><strong>2</strong> = Next most likely</span>
+      <span class="rank-chip"><strong>3</strong> = Less likely</span>
+      <span class="rank-chip"><strong>4</strong> = Least likely</span>
+    </div>
+  </div>
+
+  <div class="rise-pills">
+    <div class="rise-pill pill-r">🧭 Ready</div>
+    <div class="rise-pill pill-i">🧩 Integrator</div>
+    <div class="rise-pill pill-s">☂️ Supportive</div>
+    <div class="rise-pill pill-e">💡 Empowered</div>
+  </div>
+
+  <div class="welcome-form">
+    <h3>Let's get started</h3>
+    <p>Enter a nickname to begin. Your results are just for you.</p>
+    <input type="text" id="nickname-input" placeholder="Your nickname..." maxlength="30"
+      onkeydown="if(event.key==='Enter') startQuiz()" />
+    <button class="btn-start" onclick="startQuiz()">Take the Test →</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="screen">
+  <div class="quiz-top">
+    <div style="font-size:1.6rem;font-weight:800;color:#1a1a3e;margin-bottom:6px;">RISE Personality Test</div>
+    <div class="quiz-progress-label" id="progress-text">0 of 15 scenarios ranked</div>
+    <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="progress-bar"></div></div>
+  </div>
+  <div id="questions-container"></div>
+  <div class="btn-submit-wrap">
+    <button class="btn-submit" onclick="submitQuiz()">See My Results →</button>
+    <div class="error-msg" id="error-msg">⚠️ Please rank all four options for every scenario before continuing.</div>
+  </div>
+</div>
+
+<div id="results-screen" class="screen">
+  <div class="results-hero">
+    <div class="results-badge">✦ Your RISE Profile</div>
+    <div class="results-title" id="results-title"></div>
+    <div class="results-subtitle">Your scores show your relative RISE behavioural preferences</div>
+  </div>
+  <div id="mello-intro-container"></div>
+  <div id="primary-card-container"></div>
+  <div class="score-cards" id="score-cards-container"></div>
+  <div class="radar-section">
+    <h3>Your RISE at a Glance</h3>
+    <canvas id="radarChart" width="500" height="500" style="max-width:500px;width:100%;margin:0 auto;display:block;"></canvas>
+    <div class="scoring-note">
+      Scores are preference indexes from 0–100, calculated from your rankings. Higher values indicate a stronger relative preference for that RISE behaviour.
+    </div>
+  </div>
+  <div class="whats-next">
+    <h3>What's Next? 🌟</h3>
+    <p>Keep growing your strengths and lifting others as we rise together as One PSD!</p>
+    <button class="btn-retake" onclick="retakeQuiz()">Retake the Test</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    scenario: "Scenario 1",
+    text: "A new AI tool is introduced at your workplace. What's your first reaction?",
+    options: [
+      { letter: "A", text: "I'm excited to explore how it could help me work smarter in the future.", theme: "R" },
+      { letter: "B", text: "I wonder how different teams could use it together for greater impact.", theme: "I" },
+      { letter: "C", text: "I'd check if anyone needs help getting comfortable with the new technology.", theme: "S" },
+      { letter: "D", text: "I'd dive in, try it out and share my tips and experience with others.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 2",
+    text: "Your team is facing a challenge that no one has a clear answer to. What do you do?",
+    options: [
+      { letter: "A", text: "I research emerging trends and approaches that could offer a fresh solution.", theme: "R" },
+      { letter: "B", text: "I reach out to other teams who might have relevant experience.", theme: "I" },
+      { letter: "C", text: "I make sure everyone feels heard and supported through the uncertainty.", theme: "S" },
+      { letter: "D", text: "I propose an idea even if it's untested — we won't know until we try.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 3",
+    text: "You notice two colleagues from different departments have conflicting priorities. What do you do?",
+    options: [
+      { letter: "A", text: "I think about how aligning their goals could benefit the organisation long-term.", theme: "R" },
+      { letter: "B", text: "I step in to facilitate a conversation and help them find common ground.", theme: "I" },
+      { letter: "C", text: "I check in with both of them individually to understand how they're feeling.", theme: "S" },
+      { letter: "D", text: "I suggest a bold new approach that could work for both sides.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 4",
+    text: "You are given a project with no clear instructions. What's your approach?",
+    options: [
+      { letter: "A", text: "I research best practices and think about what skills this project will help me build.", theme: "R" },
+      { letter: "B", text: "I map out all the stakeholders involved and make sure everyone is aligned.", theme: "I" },
+      { letter: "C", text: "I check in with the team to make sure everyone feels confident and supported.", theme: "S" },
+      { letter: "D", text: "I take ownership and get started, learning and adjusting as I go.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 5",
+    text: "A colleague shares an idea in a meeting that you think could be improved. What do you do?",
+    options: [
+      { letter: "A", text: "I build on their idea by connecting it to future trends or longer-term goals.", theme: "R" },
+      { letter: "B", text: "I suggest how the idea could be strengthened by involving other teams.", theme: "I" },
+      { letter: "C", text: "I affirm their contribution first, then gently offer constructive feedback.", theme: "S" },
+      { letter: "D", text: "I share my honest perspective openly, even if it challenges the idea.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 6",
+    text: "You have just made a significant mistake on an important piece of work. What do you do?",
+    options: [
+      { letter: "A", text: "I reflect on what I can do differently and how I can improve going forward.", theme: "R" },
+      { letter: "B", text: "I loop in the relevant people quickly so we can fix it together as a team.", theme: "I" },
+      { letter: "C", text: "I acknowledge the impact on others and make sure they feel supported.", theme: "S" },
+      { letter: "D", text: "I own the mistake, learn from it and move forward without dwelling on it.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 7",
+    text: "You are asked to present your team's work to senior leadership. What's your focus?",
+    options: [
+      { letter: "A", text: "I highlight how the work positions the team for future challenges and opportunities.", theme: "R" },
+      { letter: "B", text: "I emphasise how the work connects different parts of the organisation.", theme: "I" },
+      { letter: "C", text: "I make sure the team's contributions are recognised and everyone feels valued.", theme: "S" },
+      { letter: "D", text: "I speak confidently and share bold recommendations, even if they're unconventional.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 8",
+    text: "A new colleague joins your team and seems to be struggling to settle in. What do you do?",
+    options: [
+      { letter: "A", text: "I share resources and tips that helped me grow when I was new.", theme: "R" },
+      { letter: "B", text: "I introduce them to key people across teams so they feel connected.", theme: "I" },
+      { letter: "C", text: "I check in regularly and create space for them to share how they're feeling.", theme: "S" },
+      { letter: "D", text: "I encourage them to jump in and try things, reassuring them it's okay to learn as they go.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 9",
+    text: "You disagree with a decision made by your manager. What do you do?",
+    options: [
+      { letter: "A", text: "I think about the long-term implications and prepare a well-researched case.", theme: "R" },
+      { letter: "B", text: "I consider who else is affected and whether a broader conversation is needed.", theme: "I" },
+      { letter: "C", text: "I approach my manager privately and share my concerns in a respectful, caring way.", theme: "S" },
+      { letter: "D", text: "I speak up directly and share my perspective, even if it's uncomfortable.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 10",
+    text: "You are given the chance to attend a training programme outside your usual area of work. What do you do?",
+    options: [
+      { letter: "A", text: "I jump at the chance — building new skills keeps me future-ready.", theme: "R" },
+      { letter: "B", text: "I think about how what I learn could benefit my wider team and organisation.", theme: "I" },
+      { letter: "C", text: "I consider whether a colleague might benefit more and offer to share what I learn.", theme: "S" },
+      { letter: "D", text: "I go in with an open mind and push myself to try something completely new.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 11",
+    text: "There is tension between two teams that is affecting overall performance. What do you do?",
+    options: [
+      { letter: "A", text: "I think about the systemic causes and propose a longer-term structural fix.", theme: "R" },
+      { letter: "B", text: "I bring both teams together to surface the issues and find shared solutions.", theme: "I" },
+      { letter: "C", text: "I reach out to individuals on both sides to understand how they're feeling.", theme: "S" },
+      { letter: "D", text: "I raise the issue openly and push for action even if it feels uncomfortable.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 12",
+    text: "You are feeling overwhelmed with your workload. What do you do?",
+    options: [
+      { letter: "A", text: "I step back and think about how to work smarter and prioritise what matters most.", theme: "R" },
+      { letter: "B", text: "I reach out to colleagues to see if we can redistribute or collaborate on tasks.", theme: "I" },
+      { letter: "C", text: "I check in with myself first, then let my manager know so we can find a solution together.", theme: "S" },
+      { letter: "D", text: "I tackle the most important tasks head-on and trust myself to get through it.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 13",
+    text: "Your organisation is planning for the next five years. You are asked to contribute ideas. What do you focus on?",
+    options: [
+      { letter: "A", text: "I focus on future trends, emerging technologies and the skills we'll need.", theme: "R" },
+      { letter: "B", text: "I think about how different parts of the organisation can work better together.", theme: "I" },
+      { letter: "C", text: "I highlight the importance of people's wellbeing and a supportive culture.", theme: "S" },
+      { letter: "D", text: "I push for bold, ambitious ideas that challenge the status quo.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 14",
+    text: "You notice a process in your organisation that seems outdated and inefficient. What do you do?",
+    options: [
+      { letter: "A", text: "I research how other organisations have modernised similar processes.", theme: "R" },
+      { letter: "B", text: "I map out who is affected and bring the right people together to redesign it.", theme: "I" },
+      { letter: "C", text: "I speak to the people who use the process daily to understand their pain points.", theme: "S" },
+      { letter: "D", text: "I draft a proposal and present it to leadership, even without being asked.", theme: "E" },
+    ]
+  },
+  {
+    scenario: "Scenario 15",
+    text: "You are asked to mentor a junior colleague. What is your approach?",
+    options: [
+      { letter: "A", text: "I help them identify the skills and knowledge they'll need for the future.", theme: "R" },
+      { letter: "B", text: "I connect them with people across the organisation who can broaden their perspective.", theme: "I" },
+      { letter: "C", text: "I create a safe space where they feel comfortable sharing their challenges.", theme: "S" },
+      { letter: "D", text: "I encourage them to take on stretch assignments and back themselves.", theme: "E" },
+    ]
+  }
+];
+
+const themeInfo = {
+  R: {
+    name: "Be Ready for the Future", short: "Ready", color: "#00897b",
+    gradient: "linear-gradient(135deg, #00b4a0, #00897b)",
+    tagline: "Ready for What's Next",
+    desc: "You plan ahead and think long-term. You're future-focused, embrace change, and actively build the skills needed for tomorrow.",
+    primaryDesc: "You are forward-looking and future-focused. You lead transformative efforts, embrace change with confidence, and continuously build the competencies needed to thrive in an evolving world.",
+    melloName: "Ready Mello", melloMsg: "Be forward-looking and think long-term",
+    traits: ["Curiosity", "Learning", "Growth"],
+  },
+  I: {
+    name: "Be an Integrator", short: "Integrator", color: "#6a1b9a",
+    gradient: "linear-gradient(135deg, #9c27b0, #6a1b9a)",
+    tagline: "Connecting Ideas, Connecting People",
+    desc: "You connect ideas, people and different perspectives. You build bridges across teams and think at the system level.",
+    primaryDesc: "You naturally connect ideas, people and perspectives. You build bridges across boundaries, intervene at the system level, and bring people together to create greater collective impact.",
+    melloName: "Integrator Mello", melloMsg: "Connect ideas, people and perspectives",
+    traits: ["Collaboration", "Empathy", "Systems Thinking"],
+  },
+  S: {
+    name: "Be Supportive", short: "Supportive", color: "#c2185b",
+    gradient: "linear-gradient(135deg, #e91e8c, #c2185b)",
+    tagline: "We've Got Each Other",
+    desc: "You care for others and create a safe space. You lift people up, give great feedback, and look after yourself too.",
+    primaryDesc: "You genuinely care for the people around you and create an environment where everyone feels safe and valued. You give timely, constructive feedback and are as attentive to your own wellbeing as you are to others'.",
+    melloName: "Supportive Mello", melloMsg: "Care for self and others",
+    traits: ["Kindness", "Feedback", "Wellbeing"],
+  },
+  E: {
+    name: "Be Empowered", short: "Empowered", color: "#f57f17",
+    gradient: "linear-gradient(135deg, #ffb300, #f57f17)",
+    tagline: "Try. Learn. Grow.",
+    desc: "You take initiative and aren't afraid to try. You learn from mistakes, share bold ideas, and inspire others to do the same.",
+    primaryDesc: "You dare to do and dare to try. You take ownership, learn from setbacks, and aren't afraid to share your views even when they differ from others. You inspire those around you to step up and grow.",
+    melloName: "Empowered Mello", melloMsg: "Dare to do and dare to try",
+    traits: ["Courage", "Initiative", "Resilience"],
+  },
+};
+
+function getMelloSVG(theme) {
+  const c = {
+    R: {
+      sky: "#87CEEB", ground: "#00b4a0", bodyFill: "#f5f5f0", outfitFill: "#1a3a5c",
+      tagFill: "#00897b", tagNum: "01", tagLabel: "READY", cheek: "#ffb3b3",
+      accessoryFn: () => `<g transform="translate(148,188)"><circle r="22" fill="#e0f7f5" stroke="#00897b" stroke-width="3"/><circle r="15" fill="#b2dfdb"/><polygon points="0,-12 3,0 0,12 -3,0" fill="#e53935" opacity="0.9"/><polygon points="-12,0 0,-3 12,0 0,3" fill="#1a3a5c" opacity="0.9"/><circle r="3.5" fill="#1a1a3e"/><circle cx="2" cy="-2" r="1.5" fill="white"/></g>`,
+      sparkles: `<text x="80" y="130" font-size="18" fill="#f9c74f">✦</text><text x="220" y="120" font-size="14" fill="#00b4a0">✦</text><text x="60" y="200" font-size="10" fill="#fff" opacity="0.8">✦</text>`
+    },
+    I: {
+      sky: "#9c27b0", ground: "#6a1b9a", bodyFill: "#f5f5f0", outfitFill: "#1a3a5c",
+      tagFill: "#6a1b9a", tagNum: "02", tagLabel: "INTEGRATOR", cheek: "#ce93d8",
+      accessoryFn: () => `<g transform="translate(126,178)"><rect x="0" y="0" width="18" height="18" rx="4" fill="#e91e63" opacity="0.9"/><rect x="22" y="0" width="18" height="18" rx="4" fill="#f9c74f" opacity="0.9"/><rect x="0" y="22" width="18" height="18" rx="4" fill="#f9c74f" opacity="0.9"/><rect x="22" y="22" width="18" height="18" rx="4" fill="#00b4a0" opacity="0.9"/></g>`,
+      sparkles: `<text x="75" y="135" font-size="18" fill="#f9c74f">✦</text><text x="225" y="125" font-size="14" fill="#ce93d8">✦</text><text x="65" y="205" font-size="10" fill="#fff" opacity="0.8">✦</text>`
+    },
+    S: {
+      sky: "#e91e8c", ground: "#c2185b", bodyFill: "#f5f5f0", outfitFill: "#1a3a5c",
+      tagFill: "#c2185b", tagNum: "03", tagLabel: "SUPPORTIVE", cheek: "#f48fb1",
+      accessoryFn: () => `<g transform="translate(148,168)"><path d="M0,-22 Q28,-22 28,0 Q14,-8 0,-4 Q-14,-8 -28,0 Q-28,-22 0,-22Z" fill="#e91e8c" stroke="#c2185b" stroke-width="1.5"/><line x1="0" y1="-22" x2="0" y2="18" stroke="#c2185b" stroke-width="3" stroke-linecap="round"/><path d="M0,18 Q0,26 -6,26 Q-12,26 -12,20" fill="none" stroke="#c2185b" stroke-width="3" stroke-linecap="round"/></g>`,
+      sparkles: `<text x="78" y="132" font-size="18" fill="#f9c74f">✦</text><text x="222" y="122" font-size="14" fill="#f48fb1">✦</text><text x="62" y="202" font-size="10" fill="#fff" opacity="0.8">✦</text>`
+    },
+    E: {
+      sky: "#ffb300", ground: "#f57f17", bodyFill: "#f5f5f0", outfitFill: "#1a3a5c",
+      tagFill: "#f57f17", tagNum: "04", tagLabel: "EMPOWERED", cheek: "#ffe082",
+      accessoryFn: () => `<g transform="translate(148,172)"><ellipse rx="14" ry="16" fill="#fff9c4" stroke="#f9c74f" stroke-width="2.5"/><rect x="-6" y="14" width="12" height="5" rx="2.5" fill="#f9c74f"/><rect x="-5" y="19" width="10" height="4" rx="2" fill="#f9c74f"/><line x1="0" y1="-20" x2="0" y2="-26" stroke="#f9c74f" stroke-width="2.5" stroke-linecap="round"/><line x1="-12" y1="-15" x2="-16" y2="-19" stroke="#f9c74f" stroke-width="2.5" stroke-linecap="round"/><line x1="12" y1="-15" x2="16" y2="-19" stroke="#f9c74f" stroke-width="2.5" stroke-linecap="round"/></g>`,
+      sparkles: `<text x="76" y="133" font-size="18" fill="#fff">✦</text><text x="223" y="123" font-size="14" fill="#ffe082">✦</text><text x="63" y="203" font-size="10" fill="#fff" opacity="0.8">✦</text>`
+    }
+  }[theme];
+
+  return `
+  <svg width="300" height="340" viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="340" rx="24" fill="${c.sky}" opacity="0.25"/>
+    ${c.sparkles}
+    <ellipse cx="150" cy="320" rx="130" ry="30" fill="${c.ground}" opacity="0.3"/>
+    <ellipse cx="150" cy="318" rx="52" ry="9" fill="rgba(0,0,0,0.12)"/>
+    <rect x="82" y="200" width="136" height="110" rx="40" fill="${c.bodyFill}"/>
+    <ellipse cx="150" cy="200" rx="68" ry="30" fill="${c.bodyFill}"/>
+    <ellipse cx="108" cy="210" rx="18" ry="11" fill="white" opacity="0.5"/>
+    <ellipse cx="175" cy="205" rx="12" ry="8" fill="white" opacity="0.35"/>
+    <ellipse cx="195" cy="220" rx="8" ry="6" fill="white" opacity="0.25"/>
+    <rect x="94" y="268" width="112" height="44" rx="18" fill="${c.outfitFill}"/>
+    <text x="150" y="296" font-family="Inter,sans-serif" font-size="15" font-weight="800" fill="white" text-anchor="middle">PSD</text>
+    <ellipse cx="128" cy="238" rx="10" ry="11" fill="#1a1a3e"/>
+    <ellipse cx="172" cy="238" rx="10" ry="11" fill="#1a1a3e"/>
+    <circle cx="132" cy="233" r="4" fill="white"/><circle cx="176" cy="233" r="4" fill="white"/>
+    <circle cx="124" cy="242" r="2" fill="white" opacity="0.6"/><circle cx="168" cy="242" r="2" fill="white" opacity="0.6"/>
+    <path d="M132 258 Q150 272 168 258" stroke="#1a1a3e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="112" cy="256" rx="12" ry="7" fill="${c.cheek}" opacity="0.55"/><ellipse cx="188" cy="256" rx="12" ry="7" fill="${c.cheek}" opacity="0.55"/>
+    <ellipse cx="72" cy="272" rx="18" ry="12" fill="${c.bodyFill}" transform="rotate(-30,72,272)"/><ellipse cx="228" cy="272" rx="18" ry="12" fill="${c.bodyFill}" transform="rotate(30,228,272)"/>
+    <ellipse cx="68" cy="268" rx="8" ry="5" fill="white" opacity="0.4" transform="rotate(-30,68,268)"/><ellipse cx="232" cy="268" rx="8" ry="5" fill="white" opacity="0.4" transform="rotate(30,232,268)"/>
+    <ellipse cx="122" cy="316" rx="22" ry="13" fill="${c.bodyFill}"/><ellipse cx="178" cy="316" rx="22" ry="13" fill="${c.bodyFill}"/>
+    <ellipse cx="118" cy="313" rx="9" ry="5" fill="white" opacity="0.4"/><ellipse cx="174" cy="313" rx="9" ry="5" fill="white" opacity="0.4"/>
+    ${c.accessoryFn()}
+    <line x1="210" y1="210" x2="222" y2="198" stroke="${c.tagFill}" stroke-width="2" stroke-dasharray="3,2"/>
+    <circle cx="222" cy="196" r="5" fill="none" stroke="${c.tagFill}" stroke-width="2.5"/>
+    <rect x="210" y="268" width="62" height="38" rx="8" fill="${c.tagFill}"/>
+    <rect x="213" y="271" width="56" height="32" rx="6" fill="white" opacity="0.15"/>
+    <text x="241" y="283" font-family="Inter,sans-serif" font-size="7.5" font-weight="700" fill="white" text-anchor="middle">RISE ${c.tagNum}</text>
+    <text x="241" y="295" font-family="Inter,sans-serif" font-size="6.5" font-weight="600" fill="white" text-anchor="middle" opacity="0.9">${c.tagLabel}</text>
+  </svg>`;
+}
+
+let nickname = "";
+let lastResults = null;
+const answers = {};
+
+function updateProgress() {
+  const ranked = Object.keys(answers).length;
+  const total = questions.length;
+  const pct = Math.round((ranked / total) * 100);
+  document.getElementById("progress-bar").style.width = pct + "%";
+  document.getElementById("progress-text").textContent =
+    ranked + " of " + total + " scenarios ranked";
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function goHome() { showScreen("welcome-screen"); }
+function goResults() {
+  if (lastResults) showScreen("results-screen");
+  else alert("Complete the test first to see your results!");
+}
+
+function startQuiz() {
+  const val = document.getElementById("nickname-input").value.trim();
+  if (!val) { alert("Please enter a nickname to continue!"); return; }
+  nickname = val;
+  document.getElementById("nav-user").textContent = "Hi, " + nickname + "! 👋";
+  showScreen("quiz-screen");
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const container = document.getElementById("questions-container");
+  container.innerHTML = "";
+  questions.forEach((q, i) => {
+    const block = document.createElement("div");
+    block.className = "question-block";
+    block.id = "qblock-" + i;
+
+    const scenario = document.createElement("div");
+    scenario.className = "question-scenario";
+    scenario.textContent = q.scenario;
+    block.appendChild(scenario);
+
+    const qText = document.createElement("div");
+    qText.className = "question-text";
+    qText.textContent = q.text;
+    block.appendChild(qText);
+
+    const help = document.createElement("div");
+    help.className = "question-help";
+    help.textContent = "Drag the options into order: 1 = most likely, 4 = least likely.";
+    block.appendChild(help);
+
+    const list = document.createElement("div");
+    list.className = "ranked-list";
+    list.dataset.question = i;
+
+    q.options.forEach((opt, j) => {
+      const card = document.createElement("div");
+      card.className = "option-card";
+      card.draggable = true;
+      card.dataset.theme = opt.theme;
+      card.dataset.letter = opt.letter;
+
+      const handle = document.createElement("div");
+      handle.className = "drag-handle";
+      handle.innerHTML = "⋮⋮";
+      handle.setAttribute("aria-hidden", "true");
+
+      const label = document.createElement("div");
+      label.className = "option-label";
+      label.innerHTML =
+        `<span class="rank-badge">` + (j + 1) + `</span>` +
+        `<span class="option-letter">${opt.letter}</span>` +
+        `<span>${opt.text}</span>`;
+
+      card.appendChild(handle);
+      card.appendChild(label);
+      list.appendChild(card);
+
+      card.addEventListener("dragstart", e => {
+        card.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+      });
+      card.addEventListener("dragend", () => {
+        card.classList.remove("dragging");
+        list.querySelectorAll(".option-card").forEach(x => x.classList.remove("drag-over"));
+        saveRankedAnswer(i, list);
+      });
+      card.addEventListener("dragover", e => {
+        e.preventDefault();
+        const dragging = list.querySelector(".dragging");
+        if (!dragging || dragging === card) return;
+        list.querySelectorAll(".option-card").forEach(x => x.classList.remove("drag-over"));
+        card.classList.add("drag-over");
+        const rect = card.getBoundingClientRect();
+        const before = e.clientY < rect.top + rect.height / 2;
+        list.insertBefore(dragging, before ? card : card.nextSibling);
+        refreshRankBadges(list);
+      });
+    });
+
+    list.addEventListener("click", e => {
+      // Keyboard/mobile fallback: clicking an option swaps it upward one place.
+      const card = e.target.closest(".option-card");
+      if (!card || e.target.closest(".drag-handle")) return;
+      const current = Array.from(list.children).indexOf(card);
+      if (current > 0 && window.matchMedia("(max-width: 700px)").matches) {
+        list.insertBefore(card, list.children[current - 1]);
+        refreshRankBadges(list);
+        saveRankedAnswer(i, list);
+      }
+    });
+
+    block.appendChild(list);
+    container.appendChild(block);
+  });
+
+  // Default ordering is A, B, C, D; this is not scored until submitted,
+  // and users are explicitly asked to rank rather than accept the default.
+  updateProgress();
+}
+
+function refreshRankBadges(list) {
+  Array.from(list.children).forEach((card, idx) => {
+    const badge = card.querySelector(".rank-badge");
+    if (badge) badge.textContent = idx + 1;
+  });
+}
+
+function saveRankedAnswer(index, list) {
+  const themes = Array.from(list.children).map(card => card.dataset.theme);
+  const isComplete = themes.length === 4;
+  if (isComplete) {
+    answers[index] = themes;
+    document.getElementById("qblock-" + index)?.classList.remove("unanswered");
+  }
+  updateProgress();
+}
+
+function submitQuiz() {
+  const unanswered = [];
+  questions.forEach((_, i) => {
+    if (!answers[i] || answers[i].length !== 4) unanswered.push(i);
+  });
+
+  // Save any current ordering before checking completeness.
+  questions.forEach((_, i) => {
+    const list = document.querySelector(`.ranked-list[data-question="${i}"]`);
+    if (list) saveRankedAnswer(i, list);
+  });
+
+  const stillUnanswered = [];
+  questions.forEach((_, i) => {
+    if (!answers[i] || answers[i].length !== 4) stillUnanswered.push(i);
+  });
+
+  if (stillUnanswered.length > 0) {
+    stillUnanswered.forEach(i => {
+      document.getElementById("qblock-" + i)?.classList.add("unanswered");
+    });
+    document.getElementById("error-msg").style.display = "block";
+    const first = document.getElementById("qblock-" + stillUnanswered[0]);
+    if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  document.getElementById("error-msg").style.display = "none";
+  calculateAndShowResults();
+}
+
+function calculateAndShowResults() {
+  const scores = { R: 0, I: 0, S: 0, E: 0 };
+  const rankPoints = [4, 3, 2, 1];
+
+  questions.forEach((_, i) => {
+    const rankedThemes = answers[i];
+    rankedThemes.forEach((theme, rankIndex) => {
+      scores[theme] += rankPoints[rankIndex];
+    });
+  });
+
+  // With 15 questions:
+  // minimum possible score per dimension = 15
+  // maximum possible score per dimension = 60
+  // convert raw score to 0–100 preference index
+  const minScore = questions.length;
+  const maxScore = questions.length * 4;
+  const indexes = {};
+
+  Object.keys(scores).forEach(theme => {
+    indexes[theme] = Math.round(
+      ((scores[theme] - minScore) / (maxScore - minScore)) * 100
+    );
+  });
+
+  // Deterministic tie-break: R > I > S > E
+  const primary = ["R","I","S","E"].reduce((best, theme) => {
+    return indexes[theme] > indexes[best] ? theme : best;
+  }, "R");
+
+  lastResults = { raw: scores, pcts: indexes, primary };
+  showResults(indexes, primary, scores);
+}
+
+function showResults(pcts, primary, rawScores) {
+  showScreen("results-screen");
+  const info = themeInfo[primary];
+
+  document.getElementById("results-title").textContent = nickname + "'s RISE Profile";
+
+  const melloContainer = document.getElementById("mello-intro-container");
+  melloContainer.innerHTML = `
+    <div class="mello-intro-card mello-card-${primary.toLowerCase()} mello-enter">
+      <div class="mello-you-are" style="color:${info.color}">✦ Your strongest preference</div>
+      <div class="mello-big-name" style="color:${info.color}">${info.melloName.toUpperCase()}</div>
+      <div class="mello-tagline">${info.melloMsg}</div>
+      <div class="mello-svg-wrap">${getMelloSVG(primary)}</div>
+      <div class="mello-traits">
+        ${info.traits.map(t => `<span class="mello-trait-pill">${t}</span>`).join("")}
+      </div>
+    </div>
+  `;
+
+  const primaryContainer = document.getElementById("primary-card-container");
+  primaryContainer.innerHTML = `
+    <div class="primary-card" style="background:${info.gradient}">
+      <div class="primary-card-text">
+        <div class="primary-card-label">✦ Your Primary Profile</div>
+        <div class="primary-card-name">${info.name}</div>
+        <div class="primary-card-desc">${info.primaryDesc}</div>
+        <div class="primary-card-tagline">"${info.tagline}"</div>
+      </div>
+      <div class="primary-card-score-box">
+        <div class="primary-card-pct">${pcts[primary]}</div>
+        <div class="primary-card-pct-label">Preference Index / 100</div>
+      </div>
+    </div>
+  `;
+
+  const cardsContainer = document.getElementById("score-cards-container");
+  cardsContainer.innerHTML = "";
+  const themeOrder = ["R","I","S","E"];
+  const frag = document.createDocumentFragment();
+
+  themeOrder.forEach((t, idx) => {
+    const inf = themeInfo[t];
+    const card = document.createElement("div");
+    card.className = "score-card";
+    card.style.borderTopColor = inf.color;
+    card.style.animationDelay = (0.1 * idx) + "s";
+    card.innerHTML = `
+      <div class="score-card-theme" style="color:${inf.color}">${inf.short}</div>
+      <div class="score-card-name">${inf.name}</div>
+      <div class="score-card-pct" style="color:${inf.color}">${pcts[t]}</div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" id="bar-${t}" style="background:${inf.color};width:0%"></div>
+      </div>
+      <div class="score-card-desc">${inf.desc}</div>
+    `;
+    frag.appendChild(card);
+  });
+  cardsContainer.appendChild(frag);
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      themeOrder.forEach(t => {
+        const bar = document.getElementById("bar-" + t);
+        if (bar) bar.style.width = pcts[t] + "%";
+      });
+    }, 250);
+  });
+
+  drawRadar(pcts);
+}
+
+function drawRadar(pcts) {
+  const canvas = document.getElementById("radarChart");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const radius = W * 0.28;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const labels = ["Ready", "Integrator", "Supportive", "Empowered"];
+  const keys = ["R", "I", "S", "E"];
+  const colors = ["#00897b", "#6a1b9a", "#c2185b", "#f57f17"];
+  const angles = [-Math.PI/2, 0, Math.PI/2, Math.PI];
+
+  [25, 50, 75, 100].forEach(ring => {
+    ctx.beginPath();
+    angles.forEach((angle, i) => {
+      const r = radius * (ring / 100);
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(0,0,0,0.08)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#bbb";
+    ctx.font = "11px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(ring + "%", cx + 6, cy - radius * (ring / 100) - 4);
+  });
+
+  angles.forEach(angle => {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
+    ctx.strokeStyle = "rgba(0,0,0,0.10)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  ctx.beginPath();
+  angles.forEach((angle, i) => {
+    const r = radius * (pcts[keys[i]] / 100);
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = "rgba(0,180,160,0.13)";
+  ctx.fill();
+  ctx.strokeStyle = "#00b4a0";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  angles.forEach((angle, i) => {
+    const r = radius * (pcts[keys[i]] / 100);
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  const labelOffset = radius + 52;
+  angles.forEach((angle, i) => {
+    const lx = cx + labelOffset * Math.cos(angle);
+    const ly = cy + labelOffset * Math.sin(angle);
+    ctx.fillStyle = colors[i];
+    ctx.font = "bold 13px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(labels[i], lx, ly - 9);
+    ctx.fillStyle = "#888";
+    ctx.font = "12px Inter, sans-serif";
+    ctx.fillText(pcts[keys[i]] + "%", lx, ly + 9);
+  });
+}
+
+function retakeQuiz() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  lastResults = null;
+  nickname = "";
+  document.getElementById("nickname-input").value = "";
+  document.getElementById("nav-user").textContent = "";
+  document.getElementById("progress-bar").style.width = "0%";
+  document.getElementById("progress-text").textContent = "0 of 15 scenarios ranked";
+  document.getElementById("error-msg").style.display = "none";
+  document.getElementById("questions-container").innerHTML = "";
+  showScreen("welcome-screen");
+}
+</script>
+</body>
+</html>
