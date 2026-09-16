@@ -55,17 +55,127 @@
   .question-scenario { font-size: 0.75rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #aaa; margin-bottom: 8px; }
   .question-text { font-size: 1.08rem; font-weight: 700; color: #1a1a3e; margin-bottom: 8px; line-height: 1.55; }
   .question-help { font-size: 0.82rem; color: #8b8b99; margin-bottom: 18px; }
-  .ranked-list { display: flex; flex-direction: column; gap: 10px; min-height: 120px; }
+  .ranked-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 120px;
+  }
 
-  .option-card { display: flex; align-items: stretch; gap: 12px; user-select: none; }
-  .drag-handle { width: 42px; border-radius: 12px; background: #ececf5; color: #888; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: grab; flex: 0 0 auto; }
-  .drag-handle:active { cursor: grabbing; }
-  .option-label { flex: 1; display: flex; align-items: center; min-height: 70px; padding: 14px 16px; border: 2px solid #e8e8f0; border-radius: 14px; background: #fff; font-size: 0.9rem; color: #444; line-height: 1.5; cursor: grab; transition: all 0.15s; }
-  .option-label:hover { border-color: #c9c9dc; background: #fafaff; }
-  .option-card.dragging { opacity: 0.45; }
-  .option-card.drag-over .option-label { border-color: #00b4a0; background: #f0fffc; }
-  .rank-badge { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; align-items: center; justify-content: center; background: #1a1a3e; color: #fff; font-weight: 800; font-size: 0.8rem; margin-right: 10px; flex: 0 0 auto; }
-  .option-letter { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; margin-right: 10px; background: #f0f0f8; color: #888; flex: 0 0 auto; }
+  .option-card {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    cursor: grab;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+
+  .option-card:active { cursor: grabbing; }
+
+  .option-card.dragging {
+    opacity: 0.55;
+    transform: scale(1.015);
+    z-index: 5;
+  }
+
+  .option-card.drag-over .option-label {
+    border-color: #00b4a0;
+    background: #f0fffc;
+  }
+
+  .option-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: 70px;
+    padding: 14px 16px;
+    border: 2px solid #e8e8f0;
+    border-radius: 14px;
+    background: #fff;
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.5;
+    transition: all 0.15s;
+  }
+
+  .option-label:hover {
+    border-color: #c9c9dc;
+    background: #fafaff;
+  }
+
+  .rank-badge {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    align-items: center;
+    justify-content: center;
+    background: #f1f1f5;
+    color: #555;
+    font-weight: 800;
+    font-size: 0.82rem;
+    margin-right: 12px;
+    flex: 0 0 auto;
+  }
+
+  .option-letter {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-right: 10px;
+    background: #f0f0f8;
+    color: #888;
+    flex: 0 0 auto;
+  }
+
+  .drag-handle {
+    width: 42px;
+    border-radius: 12px;
+    background: #ececf5;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex: 0 0 auto;
+    touch-action: none;
+  }
+
+  .drag-hint {
+    margin-top: 6px;
+    font-size: 0.76rem;
+    color: #aaa;
+  }
+
+  @media (max-width: 700px) {
+    .option-card {
+      gap: 8px;
+    }
+
+    .drag-handle {
+      width: 36px;
+    }
+
+    .option-label {
+      font-size: 0.86rem;
+      min-height: 74px;
+      padding: 12px 12px;
+    }
+
+    .rank-badge {
+      width: 30px;
+      height: 30px;
+      margin-right: 9px;
+    }
+  }
 
   .unanswered .question-text { color: #c0392b; }
   .unanswered { background: #fff5f5; border-radius: 16px; padding: 16px; margin: -8px; }
@@ -151,7 +261,7 @@
 <div id="welcome-screen" class="screen active">
   <div class="welcome-badge">✦ RISE Personality Assessment</div>
   <h1 class="welcome-title">Discover Your<br/><span>RISE Profile</span></h1>
-  <p class="welcome-subtitle">Rank your responses across 15 real-life scenarios and discover which RISE characteristic is your strongest preference. ~5 minutes</p>
+  <p class="welcome-subtitle">Rank your responses across 10 real-life scenarios and discover which RISE characteristic is your strongest preference. ~5 minutes</p>
 
   <div class="instruction-box">
     <strong>How it works</strong>
@@ -186,7 +296,7 @@
 <div id="quiz-screen" class="screen">
   <div class="quiz-top">
     <div style="font-size:1.6rem;font-weight:800;color:#1a1a3e;margin-bottom:6px;">RISE Personality Test</div>
-    <div class="quiz-progress-label" id="progress-text">0 of 15 scenarios ranked</div>
+    <div class="quiz-progress-label" id="progress-text">0 of 10 scenarios ranked</div>
     <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="progress-bar"></div></div>
   </div>
   <div id="questions-container"></div>
@@ -321,56 +431,6 @@ const questions = [
       { letter: "D", text: "I go in with an open mind and push myself to try something completely new.", theme: "E" },
     ]
   },
-  {
-    scenario: "Scenario 11",
-    text: "There is tension between two teams that is affecting overall performance. What do you do?",
-    options: [
-      { letter: "A", text: "I think about the systemic causes and propose a longer-term structural fix.", theme: "R" },
-      { letter: "B", text: "I bring both teams together to surface the issues and find shared solutions.", theme: "I" },
-      { letter: "C", text: "I reach out to individuals on both sides to understand how they're feeling.", theme: "S" },
-      { letter: "D", text: "I raise the issue openly and push for action even if it feels uncomfortable.", theme: "E" },
-    ]
-  },
-  {
-    scenario: "Scenario 12",
-    text: "You are feeling overwhelmed with your workload. What do you do?",
-    options: [
-      { letter: "A", text: "I step back and think about how to work smarter and prioritise what matters most.", theme: "R" },
-      { letter: "B", text: "I reach out to colleagues to see if we can redistribute or collaborate on tasks.", theme: "I" },
-      { letter: "C", text: "I check in with myself first, then let my manager know so we can find a solution together.", theme: "S" },
-      { letter: "D", text: "I tackle the most important tasks head-on and trust myself to get through it.", theme: "E" },
-    ]
-  },
-  {
-    scenario: "Scenario 13",
-    text: "Your organisation is planning for the next five years. You are asked to contribute ideas. What do you focus on?",
-    options: [
-      { letter: "A", text: "I focus on future trends, emerging technologies and the skills we'll need.", theme: "R" },
-      { letter: "B", text: "I think about how different parts of the organisation can work better together.", theme: "I" },
-      { letter: "C", text: "I highlight the importance of people's wellbeing and a supportive culture.", theme: "S" },
-      { letter: "D", text: "I push for bold, ambitious ideas that challenge the status quo.", theme: "E" },
-    ]
-  },
-  {
-    scenario: "Scenario 14",
-    text: "You notice a process in your organisation that seems outdated and inefficient. What do you do?",
-    options: [
-      { letter: "A", text: "I research how other organisations have modernised similar processes.", theme: "R" },
-      { letter: "B", text: "I map out who is affected and bring the right people together to redesign it.", theme: "I" },
-      { letter: "C", text: "I speak to the people who use the process daily to understand their pain points.", theme: "S" },
-      { letter: "D", text: "I draft a proposal and present it to leadership, even without being asked.", theme: "E" },
-    ]
-  },
-  {
-    scenario: "Scenario 15",
-    text: "You are asked to mentor a junior colleague. What is your approach?",
-    options: [
-      { letter: "A", text: "I help them identify the skills and knowledge they'll need for the future.", theme: "R" },
-      { letter: "B", text: "I connect them with people across the organisation who can broaden their perspective.", theme: "I" },
-      { letter: "C", text: "I create a safe space where they feel comfortable sharing their challenges.", theme: "S" },
-      { letter: "D", text: "I encourage them to take on stretch assignments and back themselves.", theme: "E" },
-    ]
-  }
 ];
 
 const themeInfo = {
@@ -510,6 +570,7 @@ function startQuiz() {
 function renderQuestions() {
   const container = document.getElementById("questions-container");
   container.innerHTML = "";
+
   questions.forEach((q, i) => {
     const block = document.createElement("div");
     block.className = "question-block";
@@ -527,8 +588,13 @@ function renderQuestions() {
 
     const help = document.createElement("div");
     help.className = "question-help";
-    help.textContent = "Drag the options into order: 1 = most likely, 4 = least likely.";
+    help.textContent = "Drag the responses into order: 1 = most likely, 4 = least likely.";
     block.appendChild(help);
+
+    const hint = document.createElement("div");
+    hint.className = "drag-hint";
+    hint.textContent = "On mobile, press and hold a response, then drag it up or down.";
+    block.appendChild(hint);
 
     const list = document.createElement("div");
     list.className = "ranked-list";
@@ -537,71 +603,140 @@ function renderQuestions() {
     q.options.forEach((opt, j) => {
       const card = document.createElement("div");
       card.className = "option-card";
-      card.draggable = true;
       card.dataset.theme = opt.theme;
       card.dataset.letter = opt.letter;
 
       const handle = document.createElement("div");
       handle.className = "drag-handle";
-      handle.innerHTML = "⋮⋮";
+      handle.innerHTML = "☷";
       handle.setAttribute("aria-hidden", "true");
 
       const label = document.createElement("div");
       label.className = "option-label";
       label.innerHTML =
-        `<span class="rank-badge">` + (j + 1) + `</span>` +
+        `<span class="rank-badge">${j + 1}</span>` +
         `<span class="option-letter">${opt.letter}</span>` +
         `<span>${opt.text}</span>`;
 
       card.appendChild(handle);
       card.appendChild(label);
       list.appendChild(card);
-
-      card.addEventListener("dragstart", e => {
-        card.classList.add("dragging");
-        e.dataTransfer.effectAllowed = "move";
-      });
-      card.addEventListener("dragend", () => {
-        card.classList.remove("dragging");
-        list.querySelectorAll(".option-card").forEach(x => x.classList.remove("drag-over"));
-        saveRankedAnswer(i, list);
-      });
-      card.addEventListener("dragover", e => {
-        e.preventDefault();
-        const dragging = list.querySelector(".dragging");
-        if (!dragging || dragging === card) return;
-        list.querySelectorAll(".option-card").forEach(x => x.classList.remove("drag-over"));
-        card.classList.add("drag-over");
-        const rect = card.getBoundingClientRect();
-        const before = e.clientY < rect.top + rect.height / 2;
-        list.insertBefore(dragging, before ? card : card.nextSibling);
-        refreshRankBadges(list);
-      });
     });
 
-    list.addEventListener("click", e => {
-      // Keyboard/mobile fallback: clicking an option swaps it upward one place.
-      const card = e.target.closest(".option-card");
-      if (!card || e.target.closest(".drag-handle")) return;
-      const current = Array.from(list.children).indexOf(card);
-      if (current > 0 && window.matchMedia("(max-width: 700px)").matches) {
-        list.insertBefore(card, list.children[current - 1]);
-        refreshRankBadges(list);
-        saveRankedAnswer(i, list);
-      }
-    });
+    attachPointerDrag(list, i);
 
     block.appendChild(list);
     container.appendChild(block);
+    refreshRankBadges(list);
   });
 
-  // Default ordering is A, B, C, D; this is not scored until submitted,
-  // and users are explicitly asked to rank rather than accept the default.
   updateProgress();
+}
+
+function attachPointerDrag(list, questionIndex) {
+  let dragged = null;
+  let placeholder = null;
+  let pointerId = null;
+  let dragging = false;
+
+  list.querySelectorAll(".option-card").forEach(card => {
+    card.addEventListener("pointerdown", e => {
+      // Only primary pointer; works for mouse, touch and pen.
+      if (e.button !== undefined && e.button !== 0) return;
+
+      dragged = card;
+      pointerId = e.pointerId;
+      dragging = false;
+
+      // Capture the pointer so movement continues even if the finger leaves the card.
+      try {
+        card.setPointerCapture(pointerId);
+      } catch (_) {}
+
+      card._dragStartY = e.clientY;
+      card._dragStartX = e.clientX;
+      card._dragStarted = false;
+    });
+
+    card.addEventListener("pointermove", e => {
+      if (dragged !== card || e.pointerId !== pointerId) return;
+
+      const dx = Math.abs(e.clientX - card._dragStartX);
+      const dy = Math.abs(e.clientY - card._dragStartY);
+
+      // Require a small movement threshold to distinguish scrolling/tapping from dragging.
+      if (!dragging && Math.max(dx, dy) < 8) return;
+
+      if (!dragging) {
+        dragging = true;
+        card.classList.add("dragging");
+
+        placeholder = document.createElement("div");
+        placeholder.style.height = card.getBoundingClientRect().height + "px";
+        placeholder.style.border = "2px dashed #d8d8e6";
+        placeholder.style.borderRadius = "14px";
+        placeholder.style.background = "#fafaff";
+        placeholder.style.flex = "0 0 auto";
+
+        list.insertBefore(placeholder, card);
+        card.style.width = list.clientWidth + "px";
+
+        document.body.style.overscrollBehavior = "none";
+      }
+
+      e.preventDefault();
+
+      const cards = Array.from(list.querySelectorAll(".option-card:not(.dragging)"));
+      let inserted = false;
+
+      for (const other of cards) {
+        const rect = other.getBoundingClientRect();
+        const midpoint = rect.top + rect.height / 2;
+
+        if (e.clientY < midpoint) {
+          list.insertBefore(placeholder, other);
+          inserted = true;
+          break;
+        }
+      }
+
+      if (!inserted) {
+        list.appendChild(placeholder);
+      }
+    });
+
+    const finishDrag = e => {
+      if (dragged !== card || e.pointerId !== pointerId) return;
+
+      if (dragging && placeholder) {
+        list.insertBefore(card, placeholder);
+        placeholder.remove();
+
+        card.style.width = "";
+        card.classList.remove("dragging");
+        refreshRankBadges(list);
+        saveRankedAnswer(questionIndex, list);
+      }
+
+      try {
+        card.releasePointerCapture(pointerId);
+      } catch (_) {}
+
+      document.body.style.overscrollBehavior = "";
+      dragged = null;
+      placeholder = null;
+      pointerId = null;
+      dragging = false;
+    };
+
+    card.addEventListener("pointerup", finishDrag);
+    card.addEventListener("pointercancel", finishDrag);
+  });
 }
 
 function refreshRankBadges(list) {
   Array.from(list.children).forEach((card, idx) => {
+    if (!card.classList || !card.classList.contains("option-card")) return;
     const badge = card.querySelector(".rank-badge");
     if (badge) badge.textContent = idx + 1;
   });
@@ -618,12 +753,7 @@ function saveRankedAnswer(index, list) {
 }
 
 function submitQuiz() {
-  const unanswered = [];
-  questions.forEach((_, i) => {
-    if (!answers[i] || answers[i].length !== 4) unanswered.push(i);
-  });
-
-  // Save any current ordering before checking completeness.
+  // Save every current ordering before checking completeness.
   questions.forEach((_, i) => {
     const list = document.querySelector(`.ranked-list[data-question="${i}"]`);
     if (list) saveRankedAnswer(i, list);
@@ -648,6 +778,47 @@ function submitQuiz() {
   calculateAndShowResults();
 }
 
+
+const RESULTS_WEBHOOK_URL = "https://plumber.gov.sg/webhooks/bb7f6bc7-5570-41ed-83ba-a97f9fd62f70";
+
+async function sendResultsToWebhook(results) {
+  const payload = {
+    event: "rise_quiz_completed",
+    submittedAt: new Date().toISOString(),
+    nickname: nickname,
+    scenarioCount: questions.length,
+    results: {
+      primary: results.primary,
+      rawScores: results.raw,
+      preferenceIndexes: results.pcts
+    },
+    answers: questions.map((q, i) => ({
+      scenario: q.scenario,
+      ranking: (answers[i] || []).map((theme, rankIndex) => ({
+        rank: rankIndex + 1,
+        theme,
+        option: q.options.find(opt => opt.theme === theme)?.letter || null
+      }))
+    }))
+  };
+
+  try {
+    const response = await fetch(RESULTS_WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      keepalive: true
+    });
+
+    return response.ok;
+  } catch (error) {
+    console.error("RISE webhook submission failed:", error);
+    return false;
+  }
+}
+
 function calculateAndShowResults() {
   const scores = { R: 0, I: 0, S: 0, E: 0 };
   const rankPoints = [4, 3, 2, 1];
@@ -659,9 +830,9 @@ function calculateAndShowResults() {
     });
   });
 
-  // With 15 questions:
-  // minimum possible score per dimension = 15
-  // maximum possible score per dimension = 60
+  // With 10 questions:
+  // minimum possible score per dimension = 10
+  // maximum possible score per dimension = 40
   // convert raw score to 0–100 preference index
   const minScore = questions.length;
   const maxScore = questions.length * 4;
@@ -679,7 +850,13 @@ function calculateAndShowResults() {
   }, "R");
 
   lastResults = { raw: scores, pcts: indexes, primary };
+
+  // Show the results immediately, then submit the completed assessment in the background.
   showResults(indexes, primary, scores);
+
+  sendResultsToWebhook(lastResults).then(sent => {
+    if (!sent) console.warn("RISE results were not confirmed by the webhook.");
+  });
 }
 
 function showResults(pcts, primary, rawScores) {
@@ -845,7 +1022,7 @@ function retakeQuiz() {
   document.getElementById("nickname-input").value = "";
   document.getElementById("nav-user").textContent = "";
   document.getElementById("progress-bar").style.width = "0%";
-  document.getElementById("progress-text").textContent = "0 of 15 scenarios ranked";
+  document.getElementById("progress-text").textContent = "0 of 10 scenarios ranked";
   document.getElementById("error-msg").style.display = "none";
   document.getElementById("questions-container").innerHTML = "";
   showScreen("welcome-screen");
