@@ -779,10 +779,18 @@ function submitQuiz() {
 }
 
 
-const SUPABASE_URL = "https://vpnfwuziwrujpwsxxcfh.supabase.co/rest/v1/";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbmZ3dXppd3J1anB3c3h4Y2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzIyNjUsImV4cCI6MjEwNTIwODI2NX0.WN7P244d8Q-EkclzqiDaqSyzVxMbZ76nuk6BpHFulHUey";
+const SUPABASE_URL = "https://vpnfwuziwrujpwsxxcfh.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbmZ3d3ppd3J1anB3c3h4Y2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzIyNjUsImV4cCI6MjEwNTIwODI2NX0.WN7P244d8Q-EkclzqiDaqSyzVxMbZ76nuk6BpHFulHUey";
+const SUPABASE_TABLE = "quiz_responses";
 
-async function sendResultsToWebhook(results) {
+const dominantTraitNames = {
+  R: "Ready",
+  I: "Integrator",
+  S: "Supportive",
+  E: "Empowered"
+};
+
+async function sendResultsToSupabase(results) {
   const payload = {
     nickname: nickname,
     ready_percentage: results.pcts.R,
@@ -794,22 +802,70 @@ async function sendResultsToWebhook(results) {
   };
 
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quiz_responses`, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Prefer": "return=minimal"
       },
       body: JSON.stringify(payload),
       keepalive: true
     });
 
-    return response.ok;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Supabase insert failed:", response.status, errorText);
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.error("Supabase submission failed:", error);
     return false;
   }
+}
+
+function calculateAndShowResults() {
+  const scores = { R: 0, I: 0, S: 0, E: 0 };
+  const rankPoints = [4, 3, 2, 1];
+
+  questions.forEach((_, i) => {
+    const rankedThemes = answers[i];
+    rankedThemes.forEach((theme, rankIndex) => {
+      scores[theme] += rankPoints[rankIndex];
+    });
+  });
+
+  // With 10 scenarios:
+  // minimum possible score per dimension = 10
+  // maximum possible score per dimension = 40
+  // convert raw score to a 0-100 preference index
+  const minScore = questions.length;
+  const maxScore = questions.length * 4;
+  const indexes = {};
+
+  Object.keys(scores).forEach(theme => {
+    indexes[theme] = Math.round(
+      ((scores[theme] - minScore) / (maxScore - minScore)) * 100
+    );
+  });
+
+  // Deterministic tie-break: R > I > S > E
+  const primary = ["R", "I", "S", "E"].reduce((best, theme) => {
+    return indexes[theme] > indexes[best] ? theme : best;
+  }, "R");
+
+  lastResults = { raw: scores, pcts: indexes, primary };
+
+  // Show results immediately and submit the completed result in the background.
+  showResults(indexes, primary, scores);
+  sendResultsToSupabase(lastResults).then(sent => {
+    if (!sent) {
+      console.warn("RISE result was not saved to Supabase.");
+    }
+  });
 }
 
 function showResults(pcts, primary, rawScores) {
